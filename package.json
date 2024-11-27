@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "appium": "^2.12.1",
+    "driver": "^1.0.0",
+    "plugi": "^0.1.4",
+    "plugin": "^0.3.3"
+  },
+  "devDependencies": {
+    "appium-uiautomator2-driver": "^3.9.1"
+  }
+}
