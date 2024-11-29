@@ -1,13 +1,14 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from page_elements.Cliente.url import URLManager
 import time
 
 class TestLogin:
     def setup_method(self):
         self.driver = webdriver.Edge();
         self.driver.maximize_window()
-        self.driver.get('http://127.0.0.1:8000/empleado/login')
+        self.driver.get(URLManager.LOGIN)
         time.sleep(3)
 
     def teardown_method(self):
@@ -22,7 +23,7 @@ class TestLogin:
         self.driver.find_element(By.XPATH, "//span").click()
         time.sleep(2)
         self.driver.find_element(By.XPATH, "//button[text() = 'Iniciar Sesión']").click()
-        time.sleep(2)
+        time.sleep(5)
         actual = self.driver.find_element(By.XPATH, "//li").text
         print("***********", actual)
         esperado = "Las credenciales no coinciden con nuestros registros."
@@ -41,3 +42,11 @@ class TestLogin:
         print("***********", actual)
         esperado = "Lista de Productos"
         assert esperado == actual, "Inicio de Sesión no controlado para credenciales correctas"
+
+    def test_retroceder(self):
+        self.driver.find_element(By.XPATH, "//button[text() = 'Regresar']").click()
+        time.sleep(4)
+        actual = self.driver.find_element(By.XPATH, "//section[@class = 'hero-section']//h1").text
+        print("***********", actual)
+        esperado = "¡Bienvenidos a Vilycach!"
+        assert esperado == actual, "Boton de Regresar, no redirige a la pagina principal"

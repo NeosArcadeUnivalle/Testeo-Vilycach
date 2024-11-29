@@ -1,13 +1,14 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from page_elements.Cliente.url import URLManager
 import time
 
 class TestNavbar:
     def setup_method(self):
         self.driver = webdriver.Edge();
         self.driver.maximize_window()
-        self.driver.get('http://127.0.0.1:8000/')
+        self.driver.get(URLManager.BASE_URL)
         time.sleep(3)
 
     def teardown_method(self):
