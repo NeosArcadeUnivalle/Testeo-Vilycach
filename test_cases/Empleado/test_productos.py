@@ -1,78 +1,108 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from page_elements.Cliente.url import URLManager
 import time
 
-class TestCompra:
+class TestProductos:
     def setup_method(self):
-        self.driver = webdriver.Edge();
-        self.driver.maximize_window()
-        self.driver.get(URLManager.COMPRA)
-        time.sleep(3)
-
+        self.driver = webdriver.Edge()  
+        self.driver.maximize_window()  
+        self.driver.get('http://127.0.0.1:8000/empleado/login')  
+        time.sleep(5) 
+        
     def teardown_method(self):
         self.driver.quit()
         print("Prueba Completada")
-
-    def test_form(self):
-        self.driver.find_element(By.XPATH, "//input[@name = 'nombre']").send_keys("1234567-.-.-.")
-        time.sleep(2)
-        self.driver.find_element(By.XPATH, "//input[@name = 'nombre']").send_keys("Test")
-        time.sleep(2)
-        self.driver.find_element(By.XPATH, "//input[@name = 'apellido']").send_keys("1234567..-....")
-        time.sleep(2)
-        self.driver.find_element(By.XPATH, "//input[@name = 'apellido']").send_keys("Automatizado")
-        time.sleep(2)
-        self.driver.find_element(By.XPATH, "//select[@id = 'tieneEmpresa']").click()
-        time.sleep(2)
-        self.driver.find_element(By.XPATH, "//option[@value = 'si']").click()
-        time.sleep(2)
-        self.driver.find_element(By.XPATH, "//input[@name = 'empresa']").send_keys("123423..-...")
-        time.sleep(2)
-        self.driver.find_element(By.XPATH, "//input[@name = 'empresa']").send_keys("Univalle")
-        time.sleep(2)
-        self.driver.find_element(By.XPATH, "//input[@name = 'telefono']").send_keys("aaaaaaa..-....")
-        time.sleep(2)
-        self.driver.find_element(By.XPATH, "//input[@name = 'telefono']").send_keys("7364836")
-        time.sleep(2)
-
-        element = self.driver.find_element(By.XPATH, "//input[@name = 'cantidad']")
-        
-        self.driver.execute_script("arguments[0].scrollIntoView({block: 'start', behavior: 'smooth'});", element)
-        time.sleep(2)
-
-        if not element.is_displayed():
-            self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
+  
+      
+    def test_editar(self):
+            self._login()
+            self.driver.get('http://127.0.0.1:8000/productos')
+            time.sleep(5)
+            self.driver.find_element(By.XPATH, "//a[contains(@href, '/productos/2/edit')]").click()
+            time.sleep(5)
+            self.driver.find_element(By.XPATH, "//input[@name='nombreProducto']").clear()
+            self.driver.find_element(By.XPATH, "//input[@name='nombreProducto']").send_keys("Producto Editado")
             time.sleep(2)
+            self.driver.find_element(By.XPATH, "//input[@name='cantidadDisponible']").clear()
+            self.driver.find_element(By.XPATH, "//input[@name='cantidadDisponible']").send_keys("200")
+            time.sleep(2)
+            self.driver.find_element(By.XPATH, "//input[@name='precio']").clear()
+            self.driver.find_element(By.XPATH, "//input[@name='precio']").send_keys("50.00")
+            time.sleep(2)
+            tipo_ladrillo_dropdown = self.driver.find_element(By.XPATH, "//select[@id='idTipoLadrillo']")
+            tipo_ladrillo_dropdown.click()
+            time.sleep(1)
+            tipo_ladrillo_dropdown.send_keys("Especial")
+            time.sleep(2)
+            self.driver.find_element(By.XPATH, "//button[@type='submit' and contains(text(), 'Actualizar')]").click()
+            time.sleep(5)
+            alert = self.driver.switch_to.alert
+            print(f"Mensaje del alert: {alert.text}")
+            alert.accept()
+            time.sleep(5)
 
-        self.driver.find_element(By.XPATH, "//select[@id = 'producto']").click()
-        time.sleep(2)
-        self.driver.find_element(By.XPATH, "//option[@value = '13']").click()
-        time.sleep(2)
+            actual = self.driver.find_element(By.XPATH, "//td[contains(text(), 'Producto Editado')]").text
+            esperado = "Producto Editado"
+            assert actual == esperado, f"Falla: Se esperaba '{esperado}' pero se obtuvo '{actual}'"
+       
 
-        limpiar = self.driver.find_element(By.XPATH, "//input[@name = 'cantidad']")
-        limpiar.clear()
-        time.sleep(2)
-        self.driver.find_element(By.XPATH, "//input[@name = 'cantidad']").send_keys("cr.-.-.")
-        time.sleep(2)
-        self.driver.find_element(By.XPATH, "//input[@name = 'cantidad']").send_keys("5000")
-        time.sleep(2)
+    def test_agregar(self):
+            self._login()
+            self.driver.get('http://127.0.0.1:8000/productos')
+            time.sleep(5)
+            self.driver.find_element(By.XPATH, "//a[text()='Agregar Producto']").click()
+            time.sleep(5)
+            self.driver.find_element(By.XPATH, "//input[@name='nombreProducto']").send_keys("Nuevo Producto")
+            time.sleep(2)
+            self.driver.find_element(By.XPATH, "//input[@name='cantidadDisponible']").send_keys("1000")
+            time.sleep(2)
+            self.driver.find_element(By.XPATH, "//input[@name='precio']").send_keys("20.00")
+            time.sleep(2)
+            tipo_ladrillo = self.driver.find_element(By.XPATH, "//select[@id='idTipoLadrillo']")
+            tipo_ladrillo.click()
+            time.sleep(1)
+            self.driver.find_element(By.XPATH, "//option[text()='Liso']").click()
+            time.sleep(2)
+            self.driver.find_element(By.XPATH, "//button[text()='Guardar']").click()
+            time.sleep(5)
 
-        self.driver.find_element(By.XPATH, "//input[@name = 'nombreLugarVenta']").send_keys("6473804")
-        time.sleep(2)
-        self.driver.find_element(By.XPATH, "//input[@name = 'nombreLugarVenta']").send_keys("Miraflores")
-        time.sleep(2)
-        self.driver.find_element(By.XPATH, "//input[@name = 'direccion']").send_keys("Av. Argentina")
-        time.sleep(2)
-        self.driver.find_element(By.XPATH, "//input[@name = 'ciudad']").send_keys("748384")
-        time.sleep(2)
-        self.driver.find_element(By.XPATH, "//input[@name = 'ciudad']").send_keys("La Paz")
-        time.sleep(2)
+            alert = self.driver.switch_to.alert
+            print(f"Mensaje del alert: {alert.text}")
+            alert.accept()
+            time.sleep(5)
 
-        element1 = self.driver.find_element(By.XPATH, "//button[text() = 'Solicitar Compra']")
-        self.driver.execute_script("arguments[0].scrollIntoView({block: 'start', behavior: 'smooth'});", element1)
-        time.sleep(2)
+            actual = self.driver.find_element(By.XPATH, "//td[contains(text(), 'Nuevo Producto')]").text
+            esperado = "Nuevo Producto"
+            assert actual == esperado, f"Falla: Se esperaba '{esperado}' pero se obtuvo '{actual}'"  
 
-        self.driver.find_element(By.XPATH, "//button[text() = 'Solicitar Compra']").click()
+    def test_buscar_y_eliminar(self):
+        self._login()
+
+        self.driver.get('http://127.0.0.1:8000/productos')
+        time.sleep(5)
+
+        search_box = self.driver.find_element(By.XPATH, "//input[@name='search']")
+        search_box.clear()
+        search_box.send_keys("Nuevo Producto")
+        time.sleep(3)
+
+        actual = self.driver.find_element(By.XPATH, "//td[contains(text(), 'Nuevo Producto')]").text
+        esperado = "Nuevo Producto"
+        assert actual == esperado, f"Falla: Se esperaba '{esperado}' pero se obtuvo '{actual}'"
+
+        eliminar_boton = self.driver.find_element(By.XPATH, "//td[contains(text(), 'Nuevo Producto')]/..//button[text()='Eliminar']")
+        eliminar_boton.click()
+        time.sleep(5)
+
+        alert = self.driver.switch_to.alert
+        print(f"Mensaje del alert: {alert.text}")
+        alert.accept()
+        time.sleep(5)
+
+    def _login(self):
+        self.driver.find_element(By.XPATH, "//input[@type='email']").send_keys("david@gmail.com")
         time.sleep(2)
+        self.driver.find_element(By.XPATH, "//input[@type='password']").send_keys("987654321")
+        time.sleep(2)
+        self.driver.find_element(By.XPATH, "//button[text()='Iniciar Sesión']").click()
+        time.sleep(5)
